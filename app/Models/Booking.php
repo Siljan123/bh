@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-class Booking extends Model
-{ 
 
-    protected $fillable = ['room_id', 'user_id'];
+class Booking extends Model
+{
+
+    protected $fillable = ['room_id', 'user_id', 'total_amount', 'paid_amount', 'payment_status'];
 
     protected static function booted()
     {
@@ -35,8 +36,3 @@ class Booking extends Model
     }
     //
 }
-
-
-
-
-

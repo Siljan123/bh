@@ -1,16 +1,19 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\Booking;
 use App\Models\Room;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
 class BookingController extends Controller
-{ public function store(Request $request)
+{
+
+    public function store(Request $request)
     {
-          // Validate the room_id to ensure it exists in the rooms table
-          $validatedData = $request->validate([
+        // Validate the room_id to ensure it exists in the rooms table
+        $validatedData = $request->validate([
             'room_id' => 'required|exists:rooms,id', // Ensure the room exists
         ]);
 
@@ -47,6 +50,26 @@ class BookingController extends Controller
 
         // Step 7: Redirect back with a success message
         return redirect()->route('dashboard')->with('success', 'Room booked successfully!');
-    
+    }
+    public function cancel($id)
+    {
+        $booking = Booking::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
+
+        // Find the associated room
+        $room = Room::findOrFail($booking->room_id);
+
+        // Delete the booking (similar to delete)
+        $booking->delete();
+
+        // Decrement the room's bookings count
+        $room->decrement('bookings');
+
+        // Update room status if available
+        if ($room->bookings < $room->capacity) {
+            $room->status = true; // Mark room as available
+            $room->save();
+        }
+
+        return redirect()->route('bookings.details')->with('success', 'Booking canceled successfully!');
     }
 }

@@ -26,6 +26,7 @@ class RoomController extends Controller
         }
         return view('auth.admin_login');
     }
+    
     public function create()
     {
         return view('rooms.create'); // Ensure you create this view
@@ -39,7 +40,7 @@ class RoomController extends Controller
         // Validate the form input
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'nullable|image|mimes:png,jpg,gif|max:9048',
             'price' => 'required|numeric|min:1',
 
             'capacity' => 'required|integer|min:1|max:6', // Max capacity of 6
@@ -53,7 +54,11 @@ class RoomController extends Controller
 
         // Handle file upload if image is provided
         if ($request->hasFile('image')) {
-            $validatedData['image'] = $request->file('image')->store('rooms', 'public');
+            try {
+                $validatedData['image'] = $request->file('image')->store('rooms', 'public');
+            } catch (\Exception $e) {
+                return redirect()->back()->withErrors(['image' => 'Failed to upload image.']);
+            }
         }
 
         // Create the room
@@ -63,8 +68,10 @@ class RoomController extends Controller
         $room->status = $room->bookings >= $room->capacity ? false : true;
         $room->save();
 
-        return redirect()->route('addroom')->with('success', 'Room Added successfully!');
+        return redirect()->route('admin.dashboard')->with('success', 'Room Added successfully!');
     }
+
+
     public function update(Request $request, $id)
     {
         $request->validate([
@@ -94,6 +101,6 @@ class RoomController extends Controller
         $room = Room::findOrFail($id);
         $room->delete();
 
-        return redirect()->route('editroomdashnoard')->with('success', 'Room deleted successfully!');
+        return redirect()->route('admin.dashboard')->with('success', 'Room deleted successfully!');
     }
 }

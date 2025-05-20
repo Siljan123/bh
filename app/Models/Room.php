@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Room extends Model
 {
     //
-    protected $fillable = ['name', 'image', 'price', 'capacity', 'status'];
+    protected $fillable = ['name','capacity' , 'price', 'image', 'status'];
 
     // Define the relationship
     public function bookings()

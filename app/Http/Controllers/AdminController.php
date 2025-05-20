@@ -3,19 +3,16 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\User;
 
-use Illuminate\Support\Facades\Response;
-use App\Models\Admin;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\AdminLoginRequest;
 
 
 use Illuminate\Support\Facades\Auth;
 
 
 
-use Illuminate\Support\Facades\Hash; 
-
+use App\Models\Message;
 
 class AdminController extends Controller
 {
@@ -72,5 +69,28 @@ class AdminController extends Controller
         return redirect()->route('admin.login');
     }
 
+    public function updateStatus(Request $request, $id)
+    {
+        $boarder = User::findOrFail($id);
+        $boarder->status = $request->status;
+        $boarder->save();
+    
+        return redirect()->back()->with('success', 'Status updated successfully.');
+    }
+    public function storesmessage(Request $request)
+{
+    $validated = $request->validate([
+        'message' => 'required|string|max:5000',
+        'admin_id' => 'required|exists:admins,id',
+    ]);
+
+    Message::create([
+        'user_id' => Auth::id(),
+        'admin_id' => $validated['admin_id'],
+        'message' => $validated['message'],
+    ]);
+
+    return back()->with('success', 'Your message has been sent to the landlord!');
+}
     
 }

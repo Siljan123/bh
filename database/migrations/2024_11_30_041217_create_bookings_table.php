@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('room_id')->constrained()->onDelete('cascade'); // Link to the room table
             $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Assuming a user
+          
             $table->timestamps();
         });
     }
